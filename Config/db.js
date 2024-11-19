@@ -1,14 +1,31 @@
-const mongoose = require('mongoose');
+// connectDB.js
+const { MongoClient, ServerApiVersion } = require('mongodb');
+require('dotenv').config();
 
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.7lbrva6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-const connectDB = async () => {
+let db; // This variable will hold the database connection
+
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+async function connectDB() {
+  if (!db) { 
     try {
-        await mongoose.connect(`mongodb://${process.env.DB_User}:${process.env.DB_Password}@ac-62j8ihz-shard-00-00.7lbrva6.mongodb.net:27017,ac-62j8ihz-shard-00-01.7lbrva6.mongodb.net:27017,ac-62j8ihz-shard-00-02.7lbrva6.mongodb.net:27017/?ssl=true&replicaSet=atlas-g1t94d-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0`);
-        console.log('Flight booking MongoDB Connected...');
-    } catch (err) {
-        console.error("MongoDB Connection Error ", err.message);
-        process.exit(1);
+      // await client.connect(); 
+      console.log("MongoDB Connected");
+      db = client.db('FlightBooking'); 
+    } catch (error) {
+      console.error('MongoDB Connection Error', error);
+      process.exit(1);
     }
-};
+  }
+  return db; 
+}
 
 module.exports = connectDB;
